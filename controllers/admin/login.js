@@ -1,3 +1,4 @@
+"use strict";
 var bcrypt = require('bcrypt'),
     queries = require('../../modules/Queries'),
     validate = require('../../modules/Validation');
