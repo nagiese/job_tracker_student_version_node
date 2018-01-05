@@ -19,34 +19,27 @@ login.login = function(){
     data = JSON.stringify(data);
 
     Util.sendRequest('/login', function(res){
+        var obj = {};
         /* IF THE LOGIN IS SUCCESSFUL REDIRECT TO THE HOME PAGE OTHERWISE DISPLAY ERROR MESSAGE AND CLEAR INPUT BOXES */
-        if(res.response === "loginsuccess"){
-            window.location = "/home";
+        obj = JSON.parse(res.responseText);
+        
+        /* CLEAR EMAIL AND PASSWORD TEXTBOXES */
+        email[0].value = "";
+        password[0].value = "";
+        switch(obj.masterstatus){
+            case 'badlogin' : obj.bk = "red"; obj.title = "ERROR"; login.displaybox(obj); break;
+            case 'err' : obj.bk = "red"; obj.title = "ERROR"; login.displaybox(obj); break;
+            case 'notfound' : obj.bk = "red"; obj.title = "ERROR"; login.displaybox(obj); break;
+            case 'success' : window.location = "/home";
         }
-        else {
-            email[0].value = "";
-            password[0].value = "";
-            login.generateMessage(res.response);
-        }
-    }, data);
+     }, data);
 }
 
-/* HERE I WRITE A MESSAGE BASED UPON WHAT RESPONSE I GET BACK FROM THE SERVER AS I HAVE MANY DIFFERENT TYPES OF ERROR CODES.*/
-login.generateMessage = function(response){
-    var msg = [];
-    switch(response){
-        case "badlogin" : msg = ["Error","red","Incorrect format for username and/or password."];break;
-        case "error" : msg = ["Error","red","There is an error with the login process technical support has been contacted."];break;
-        case "emailnotfound" : msg = ["Error","red","There is no record with that username and password."];break;
-        case "loginerror" : msg = ["Error","red","There is no record with that username and password"];break;
-    }
-    login.displaybox(msg);
-}
-
-login.displaybox = function(msg){
+/* THIS FUNCTION DISPLAYS THE BOX.  THIS FUNCTION COULD BE MOVED TO THE GENERAL.JS FILE AS IT COULD BE USED MY MULTIPLE DIFFERENT JS FILES */
+login.displaybox = function(obj){
     Util.msgBox({
-        heading: {text: msg[0], background: msg[1], color: "#FFF"},
-        body: {text: msg[2]},
+        heading: {text: obj.title, background: obj.bk, color: "#FFF"},
+        body: {text: obj.msg},
     });
     setTimeout(Util.closeMsgBox, 2500);
 }
